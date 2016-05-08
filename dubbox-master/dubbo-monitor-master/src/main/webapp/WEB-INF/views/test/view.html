@@ -1,0 +1,109 @@
+#tag layout_block("mainContent")
+<style type="text/css">  
+    code {  
+      background-color: #f5f5f5;  
+    }  
+  
+    #jsoneditor {  
+      width: 100%;  
+      height: 250px;  
+    }  
+  
+    #jsoneditor_result {  
+      width: 100%;  
+      height: 400px;  
+    }  
+  </style>  
+<section class="content-header">
+  <h1>
+    Tests
+    <small>overview >> ${service}->${method}</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href=""><i class="fa fa-home"></i> Home</a></li>
+    <li class="active">Tests</li>
+  </ol>
+</section>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#submit").on("click", function(){
+		var host = $(this).attr("data-host");
+		var port = $(this).attr("data-port");
+		var method = $(this).attr("data-method");
+		var service = $(this).attr("data-service");
+		var json1 = editor.get();
+		console.log(JSON.stringify(json1));
+		var index = layer.load(1, {  shade: [0.1,'#fff'] });
+		var $this = $(this);
+		$this.prop("disabled", true).text("submiting...");
+		$.post("tests/invoke",{
+			host:host,
+			port:port,
+			method:method,
+			service:service,
+			json:JSON.stringify(json1)
+		},function(result){
+			layer.close(index);
+			$this.prop("disabled", false).text("submit");
+			if(result){
+				editor_result.set(result);
+			} else {
+				editor_result.set({});
+			}
+		  });
+	});
+});
+</script>
+
+<!-- Main content -->
+<section class="content">
+
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box box-primary">
+        <!-- /.box-header -->
+        <div id="jsoneditor" class="box-body table-responsive no-padding">
+          	<script>
+		        // create the editor
+		        var container = document.getElementById("jsoneditor");
+		        var options = {};
+		        var editor = new JSONEditor(container, options);
+		
+		        editor.set(${jsonParameter});
+		
+		    </script>
+        </div>
+        <!-- /.box-body -->
+      </div>
+      <!-- /.box -->
+    </div>
+    
+     <div class="col-xs-2">
+     		<button id="submit" data-host="${host}" data-port="${port}" data-method="${method}" data-service=${service} type="button" class="btn btn-block btn-success">submit</button>
+  	 </div>
+  	 
+    
+     <div class="col-xs-12">
+      <div class="box box-primary">
+      <span>result:</span>
+        <!-- /.box-header -->
+        <div id="jsoneditor_result" class="box-body table-responsive no-padding">
+        	<script>
+	         // create the editor
+		        var container_result = document.getElementById("jsoneditor_result");
+		        var options_result = {};
+		        var editor_result = new JSONEditor(container_result, options_result);
+		         editor_result.set({});
+	         </script>
+        </div>
+        <!-- /.box-body -->
+      </div>
+      <!-- /.box -->
+    </div>
+  </div>
+
+</section>
+#end
+
+#include ("../common/main_layout.html")
